@@ -24,7 +24,6 @@ public class EventsFunction
             databaseName: "eventplanning",
             containerName: "events",
             Connection = "CosmosDBConnection",
-            //PartitionKey = "id",
             SqlQuery = "SELECT * FROM c where c.IsDeleted = false"
         )] IEnumerable<FirstAidEvent> events)
 
@@ -39,17 +38,14 @@ public class EventsFunction
     [CosmosDBOutput(databaseName: "eventplanning",
             containerName: "events",
             Connection = "CosmosDBConnection", CreateIfNotExists = false)]
-    public async Task<IActionResult> AddEvent([HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+    public async Task<FirstAidEvent> AddEvent([HttpTrigger(AuthorizationLevel.Anonymous, "post")]
          HttpRequest req)
     {
         var newEvent = await req.ReadFromJsonAsync<FirstAidEvent>();
-        if (newEvent == null)
-        {
-            return new BadRequestObjectResult("Invalid event data.");
-        }
+
         newEvent.id = Guid.NewGuid();
                
-        return new OkObjectResult(newEvent);
+        return newEvent;
     }
 
 }
